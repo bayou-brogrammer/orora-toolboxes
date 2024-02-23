@@ -1,0 +1,58 @@
+name: Build and Push Image
+
+on:
+  schedule:
+    - cron: "0 6 * * *" # at 06:00 UTC (midnight CST)
+
+  pull_request:
+    branches:
+      - main
+      - testing
+    paths-ignore:
+      - "**.md"
+
+  push:
+    branches:
+      - main
+      - testing
+    tags:
+      - "v*.*.*"
+    paths-ignore:
+      - "**.md"
+
+  workflow_dispatch:
+
+env:
+  IMAGE_VARIANT: main
+  FEDORA_MAJOR_VERSION: 39
+
+jobs:
+  run-build:
+    name: Build and Push Orora Image
+    runs-on: ubuntu-22.04
+    continue-on-error: false
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      max-parallel: 5
+      matrix:
+        toolbox_name: ["orora-cli", "wolfi-toolbox", "wolfi-dx-toolbox"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Build and Deploy image
+        uses: bayou-brogrammer/cosmos-container-action@main
+        with:
+          support: latest
+          file: ./Dockerfile
+          push_container: "true"
+          target: ${{ matrix.toolbox_name }}
+          image_name: ${{ matrix.toolbox_name }}
+          image_variant: ${{ env.IMAGE_VARIANT }}
+          version: ${{ env.FEDORA_MAJOR_VERSION }}
+          signing_key: ${{ secrets.SIGNING_SECRET }}
+          container_registry: ghcr.io/${{ github.repository }}
