@@ -22,8 +22,14 @@ on:
 
   workflow_dispatch:
 
+concurrency:
+  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref || github.run_id }}
+
 env:
   IMAGE_VARIANT: main
+  DOCKER_BUILDKIT: 1
+  BUILDX_EXPERIMENTAL: 1
   FEDORA_MAJOR_VERSION: 39
 
 jobs:
@@ -33,6 +39,8 @@ jobs:
     continue-on-error: false
     permissions:
       contents: read
+      packages: write
+      id-token: write
     strategy:
       fail-fast: false
       max-parallel: 5
@@ -44,15 +52,29 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Generate Containerfile path
+        shell: bash
+        run: |
+          #!/bin/bash
+
+          TOOLBX="orora-cli"
+          if "${TOOLBX}" ~= "wolfi"; then
+            TOOLBX="wolfi-toolbox"
+          fi
+
+          echo "CONTAINERFILE_PATH=./toolboxes/${TOOLBX}/Containerfile" >> $GITHUB_ENV
+
       - name: Build and Deploy image
         uses: bayou-brogrammer/cosmos-container-action@main
         with:
           support: latest
-          file: ./Dockerfile
           push_container: "true"
           target: ${{ matrix.toolbox_name }}
+          file: ${{ env.CONTAINERFILE_PATH }}
           image_name: ${{ matrix.toolbox_name }}
           image_variant: ${{ env.IMAGE_VARIANT }}
           version: ${{ env.FEDORA_MAJOR_VERSION }}
           signing_key: ${{ secrets.SIGNING_SECRET }}
           container_registry: ghcr.io/${{ github.repository }}
+        env:
+          CONTAINERFILE_PATH: ${{ env.CONTAINERFILE_PATH }}

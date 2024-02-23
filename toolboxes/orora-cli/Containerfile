@@ -128,12 +128,11 @@ RUN [ -e /sbin/su-exec ] && \
     printf "%s\n%s" '#!/bin/sh' '/sbin/su-exec root "$@"' > /usr/bin/sudo && \
     chmod +x /usr/bin/sudo || true
 
-RUN \
-    # Change root shell to FISH
-    sed -i -e '/^root/s/\/bin\/ash/\/usr\/bin\/fish/' /etc/passwd && \
-    # Patch /usr/bin/entrypoint
-    sed -i '/missing_packages=0/,/# Set SHELL to the install path inside the container/ s/^/#/' /usr/bin/entrypoint && \
-    sed -i '/# Set SHELL to the install path inside the container/a touch /.containersetupdone' /usr/bin/entrypoint
+# Use and configure bash, retrieve bash-prexec
+RUN curl https://raw.githubusercontent.com/rcaloras/bash-preexec/master/bash-preexec.sh -o /tmp/bash-prexec && \
+    mkdir -p /usr/share/ && \
+    cp /tmp/bash-prexec /usr/share/bash-prexec && \
+    rm -rf /tmp/bash-prexec
 
 COPY --from=orora-files /usr/local/bin/ /usr/local/bin/
 COPY --from=orora-files /usr/bin /usr/bin/
@@ -146,11 +145,11 @@ RUN \
     # Change user shell to FISH
     chsh --shell /usr/bin/fish ${USERNAME}
 
-# Use and configure bash, retrieve bash-prexec
-RUN curl https://raw.githubusercontent.com/rcaloras/bash-preexec/master/bash-preexec.sh -o /tmp/bash-prexec && \
-    mkdir -p /usr/share/ && \
-    cp /tmp/bash-prexec /usr/share/bash-prexec && \
-    rm -rf /tmp/bash-prexec
+# Patch /usr/bin/entrypoint
+RUN sed -i '/missing_packages=0/,/# Set SHELL to the install path inside the container/ s/^/#/' /usr/bin/entrypoint && \
+    sed -i '/# Set SHELL to the install path inside the container/a touch /.containersetupdone' /usr/bin/entrypoint && \
+    # Change root shell to FISH
+    sed -i -e '/^root/s/\/bin\/ash/\/usr\/bin\/fish/' /etc/passwd
 
 # ==========
 # USER

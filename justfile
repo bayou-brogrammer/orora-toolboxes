@@ -31,6 +31,8 @@ build-no-cache:
 
 build-orora:
   just build -t orora-cli:latest -f ./toolboxes/orora-cli/Containerfile
+build-wolfi:
+  just build -t orora-cli:latest -f ./toolboxes/wolfi-toolbox/Containerfile
 
 # ================================
 # DistroBox
