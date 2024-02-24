@@ -4,6 +4,12 @@
   <img width="75%" alt="orora" src="assets/thumbnail.webp">
 </div>
 
+<div align="center">
+
+[![Deploy Ōrora Toolboxes](https://github.com/bayou-brogrammer/orora-toolboxes/actions/workflows/build-containers.yml/badge.svg)](https://github.com/bayou-brogrammer/orora-toolboxes/actions/workflows/build-containers.yml)
+
+</div>
+
 Centralized repository of my personal containers designed for Toolbox/Distrobox with batteries included. These toolboxes strive for:
 
 - Instant launch
