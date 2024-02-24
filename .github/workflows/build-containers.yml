@@ -43,7 +43,6 @@ jobs:
       id-token: write
     strategy:
       fail-fast: false
-      max-parallel: 5
       matrix:
         toolbox_name: ["orora-cli", "wolfi-toolbox", "wolfi-dx-toolbox"]
     steps:
@@ -65,7 +64,7 @@ jobs:
           echo "CONTAINERFILE_PATH=./toolboxes/${TOOLBX}/Containerfile" >> $GITHUB_ENV
 
       - name: Build and Deploy image
-        uses: bayou-brogrammer/cosmos-container-action@main
+        uses: bayou-brogrammer/deploy-container-action@main
         with:
           support: latest
           push_container: "true"
@@ -75,6 +74,6 @@ jobs:
           image_variant: ${{ env.IMAGE_VARIANT }}
           version: ${{ env.FEDORA_MAJOR_VERSION }}
           signing_key: ${{ secrets.SIGNING_SECRET }}
-          container_registry: ghcr.io/${{ github.repository }}
+          container_registry: ghcr.io/${{ github.repository_owner }}
         env:
           CONTAINERFILE_PATH: ${{ env.CONTAINERFILE_PATH }}
