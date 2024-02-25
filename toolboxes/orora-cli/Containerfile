@@ -1,7 +1,6 @@
 # syntax=docker/dockerfile:1.4
 
 ARG USERNAME="${USERNAME:-hikaru}"
-ARG CONTAINER_ID="${CONTAINER_ID:-orora-cli}"
 ARG SOURCE_IMAGE_NAME="${SOURCE_IMAGE_NAME:-wolfi-toolbox}"
 ARG SOURCE_IMAGE_REGISTRY="${SOURCE_IMAGE_REGISTRY:-ghcr.io/ublue-os}"
 ARG SOURCE_IMAGE="${SOURCE_IMAGE_REGISTRY}/${SOURCE_IMAGE_NAME}"
@@ -20,13 +19,11 @@ LABEL maintainer="lecoqjacob@gmail.com" \
     usage="This image is meant to be used with the toolbox or distrobox command"
 
 ARG USERNAME
-ARG CONTAINER_ID
-
 ENV PATH="/root/.cargo/bin:${PATH}"
 
 # ================================= #
 
-COPY toolboxes/orora-cli/files /
+COPY shared /
 COPY toolboxes/orora-cli/extra-packages \
     toolboxes/orora-cli/scripts \
     /tmp/
@@ -55,12 +52,3 @@ RUN curl https://raw.githubusercontent.com/rcaloras/bash-preexec/master/bash-pre
     mkdir -p /usr/share/ && \
     cp /tmp/bash-prexec /usr/share/bash-prexec && \
     rm -rf /tmp/*
-
-# ==========
-# USER
-# ==========
-USER ${USERNAME}
-WORKDIR /var/home/${USERNAME}
-
-RUN sudo chsh --shell \
-    /usr/bin/fish ${USERNAME}

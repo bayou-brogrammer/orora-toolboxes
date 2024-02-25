@@ -27,7 +27,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref || github.run_id }}
 
 env:
-  IMAGE_VARIANT: main
   DOCKER_BUILDKIT: 1
   BUILDX_EXPERIMENTAL: 1
   FEDORA_MAJOR_VERSION: 39
@@ -35,6 +34,7 @@ env:
 jobs:
   run-build:
     name: Build and Push Orora Image
+
     runs-on: ubuntu-22.04
     continue-on-error: false
     permissions:
@@ -44,7 +44,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        toolbox_name: ["orora-cli", "wolfi-toolbox", "wolfi-dx-toolbox"]
+        toolbox_name:
+          ["arch-toolbox", "orora-cli", "wolfi-toolbox", "wolfi-dx-toolbox"]
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -56,9 +58,10 @@ jobs:
         run: |
           #!/bin/bash
 
-          TOOLBX="orora-cli"
-          if "${TOOLBX}" ~= "wolfi"; then
+          if grep -q "wolfi" <<< "${{ matrix.toolbox_name }}"; then
             TOOLBX="wolfi-toolbox"
+          else
+            TOOLBX="${{ matrix.toolbox_name }}"
           fi
 
           echo "CONTAINERFILE_PATH=./toolboxes/${TOOLBX}/Containerfile" >> $GITHUB_ENV
@@ -76,4 +79,5 @@ jobs:
           signing_key: ${{ secrets.SIGNING_SECRET }}
           container_registry: ghcr.io/${{ github.repository_owner }}
         env:
+          IMAGE_VARIANT: main
           CONTAINERFILE_PATH: ${{ env.CONTAINERFILE_PATH }}

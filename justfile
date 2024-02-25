@@ -2,6 +2,8 @@
 
 set shell := ["bash", "-uc"]
 
+IMAGE_REGISTRY := "ghcr.io/bayou-brogrammer"
+
 default:
   just --list
 
@@ -21,18 +23,22 @@ setup-registry:
 # Building
 # ================================
 
-build *FLAGS='':
-  docker buildx build . {{FLAGS}}
-build-no-cache:
+build-docker *FLAGS='':
+  docker buildx build . {{FLAGS}} --progress=plain
+build-docker-no-cache:
   just build --no-cache
 # build-dev *FLAGS='':
 #   docker buildx build . {{FLAGS}} -t registry.dev.local:5000/{{IMAGE_NAME}}:dev
 #   docker push --tls-verify=false registry.dev.local:5000/{{IMAGE_NAME}}:dev
 
+build NAME:
+  just build-docker -t {{IMAGE_REGISTRY}}/{{NAME}}:latest -f ./toolboxes/{{NAME}}/Containerfile
+build-arch:
+  just build "arch-toolbox"
 build-orora:
-  just build -t orora-cli:latest -f ./toolboxes/orora-cli/Containerfile
+  just build "orora-toolbox"
 build-wolfi:
-  just build -t orora-cli:latest -f ./toolboxes/wolfi-toolbox/Containerfile
+  just build "wolfi-toolbox"
 
 # ================================
 # DistroBox
