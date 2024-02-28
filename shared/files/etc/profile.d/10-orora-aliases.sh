@@ -1,4 +1,5 @@
 # shellcheck shell=sh
+
 # Eza for ls
 alias ll='eza -l --icons=auto --group-directories-first' 2>/dev/null
 alias l.='eza -d .*' 2>/dev/null
@@ -18,3 +19,25 @@ alias cd='cd' 2>/dev/null
 
 # Fd for find
 alias find='fd' 2>/dev/null
+
+# ===============================
+# Ansible aliases (ansible-navigator)
+# ===============================
+
+alias anr="ansible-navigator run"
+alias ansc="ansible-navigator run --syntax-check"
+alias anc="ansible-navigator run --check"
+alias acd="ansible-navigator config dump"
+alias av="ansible --version"
+alias aig="ansible-navigator inventory --graph"
+
+# ================
+# General aliases
+# ================
+
+# lazygit
+alias lg="lazygit"
+
+# vim aliases
+alias vim="nvim"
+alias vi="nvim"

@@ -61,12 +61,12 @@ jobs:
         if: matrix.image_variant == 'sdk'
         uses: actions/download-artifact@v4
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          merge-multiple: true
-          path: ./packages
           pattern: sdk-*
+          path: ./packages
+          merge-multiple: true
           repository: wolfi-dev/tools
           run-id: ${{ env.SDK_RELEASE_RUN_ID }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       # Sign SDK with melange
       - name: Sign SDK
@@ -107,21 +107,21 @@ jobs:
         id: apko-build
         with:
           archs: aarch64,x86_64
-          config: toolboxes/wolfi-toolbox/${{ matrix.image_variant }}.apko.yaml
-          keyring-append: ./melange.rsa.pub
           repository-append: ./packages
+          keyring-append: ./melange.rsa.pub
+          config: toolboxes/wolfi-toolbox/apko/${{ matrix.image_variant }}.apko.yaml
           tag: ${{ steps.registry_case.outputs.lowercase }}/wolfi-${{ matrix.image_variant }}:${{ env.IMAGE_TAGS }}
 
-      # Build and publish image with apko
-      - name: "Build and publish image"
+      # Publish image with apko
+      - name: "Publish image"
         uses: distroless/actions/apko-publish@main
         if: github.event_name != 'pull_request'
         id: apko
         with:
           archs: aarch64,x86_64
-          config: toolboxes/wolfi-toolbox/${{ matrix.image_variant }}.apko.yaml
-          keyring-append: ./melange.rsa.pub
           repository-append: ./packages
+          keyring-append: ./melange.rsa.pub
+          config: toolboxes/wolfi-toolbox/apko/${{ matrix.image_variant }}.apko.yaml
           tag: ${{ steps.registry_case.outputs.lowercase }}/wolfi-${{ matrix.image_variant }}:${{ env.IMAGE_TAGS }}
 
       - name: Login to GitHub Container Registry

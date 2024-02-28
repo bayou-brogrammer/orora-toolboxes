@@ -1,54 +1,41 @@
-# syntax=docker/dockerfile:1.4
-
-ARG USERNAME="${USERNAME:-hikaru}"
-ARG SOURCE_IMAGE_NAME="${SOURCE_IMAGE_NAME:-wolfi-toolbox}"
-ARG SOURCE_IMAGE_REGISTRY="${SOURCE_IMAGE_REGISTRY:-ghcr.io/ublue-os}"
-ARG SOURCE_IMAGE="${SOURCE_IMAGE_REGISTRY}/${SOURCE_IMAGE_NAME}"
-
 # ============================================================================================= #
 # ORORA_CLI
 # ============================================================================================= #
 
-FROM $SOURCE_IMAGE:latest
+FROM ghcr.io/ublue-os/bluefin-cli:latest
 
 # ================================= #
 
-LABEL maintainer="lecoqjacob@gmail.com" \
+LABEL maintainer="lecoqjacob@proton.me" \
     com.github.containers.toolbox="true" \
     summary="A cloud-native terminal experience" \
     usage="This image is meant to be used with the toolbox or distrobox command"
 
-ARG USERNAME
-ENV PATH="/root/.cargo/bin:${PATH}"
 
 # ================================= #
 
-COPY shared /
-COPY toolboxes/orora-cli/extra-packages \
-    toolboxes/orora-cli/scripts \
-    /tmp/
+COPY shared/files /
 
-RUN \
-    --mount=type=cache,target=/var/cache/apk \
-    apk update && apk upgrade && \
-    grep -v '^#' /tmp/extra-packages | xargs apk add --no-cache --update && \
-    mv /home/linuxbrew /home/homebrew && \
-    rm -rf /tmp/extra-packages
+RUN apk update && \
+    apk upgrade && \
+    grep -v '^#' /extra-packages | xargs apk add && \
+    mv /etc/profile.d/00-bluefin-cli-brew-firstrun.sh /etc/profile.d/00-isengard-cli-brew-firstrun.sh && \
+    sed -i 's/Bluefin/Isengard/g; s/bluefin/isengard/g' /etc/profile.d/00-isengard-cli-brew-firstrun.sh && \
+    mkdir -p /XDG_DIRS && \
+    mkdir -p /XDG_DIRS/config && \
+    mkdir -p /XDG_DIRS/local/share && \
+    mkdir -p /XDG_DIRS/local/state && \
+    mkdir -p /XDG_DIRS/cache && \
+    mv /tmux /XDG_DIRS/config/tmux && \
+    source /etc/profile.d/01-isengard-xdg.sh && \
+    git clone https://github.com/tmux-plugins/tpm /XDG_DIRS/config/tmux/plugins/tpm && \
+    /XDG_DIRS/config/tmux/plugins/tpm/bin/install_plugins && \
+    mv /isengard-nvim /XDG_DIRS/config/nvim && \
+    nvim --headless "+Lazy! sync" +qa && \
+    chmod -R o+rwx /XDG_DIRS/ && \
+    ln -fs /usr/bin/distrobox-host-exec /usr/bin/ujust && \
+    ln -fs /usr/bin/distrobox-host-exec /usr/bin/distrobox && \
+    ln -fs /usr/bin/distrobox-host-exec /usr/local/bin/code && \
+    ln -fs /usr/bin/distrobox-host-exec /usr/local/bin/kde-prompt
 
-RUN \
-    mkdir -p /etc/sudoers.d/ && \
-    useradd -ms /bin/bash "${USERNAME}" && \
-    echo -e "${USERNAME} ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/${USERNAME} && \
-    chmod 0440 /etc/sudoers.d/${USERNAME} && \
-    # Change user shell to FISH
-    chsh --shell /usr/bin/fish ${USERNAME}
-
-# Patch /usr/bin/entrypoint
-RUN sed -i '/missing_packages=0/,/# Set SHELL to the install path inside the container/ s/^/#/' /usr/bin/entrypoint && \
-    sed -i '/# Set SHELL to the install path inside the container/a touch /.containersetupdone' /usr/bin/entrypoint
-
-# Use and configure bash, retrieve bash-prexec, and cleanup
-RUN curl https://raw.githubusercontent.com/rcaloras/bash-preexec/master/bash-preexec.sh -o /tmp/bash-prexec && \
-    mkdir -p /usr/share/ && \
-    cp /tmp/bash-prexec /usr/share/bash-prexec && \
-    rm -rf /tmp/*
+RUN rm /extra-packages

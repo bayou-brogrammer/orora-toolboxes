@@ -1,4 +1,5 @@
 # shellcheck shell=sh disable=SC1091
+
 if test "$(id -u)" -gt "0"; then
   blue=$(printf '\033[38;5;32m')
   bold=$(printf '\033[1m')

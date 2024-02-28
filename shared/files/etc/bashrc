@@ -46,20 +46,6 @@ if [ -z "$BASHRCSOURCED" ]; then
     # fi
     # to your custom modification shell script in /etc/profile.d/ directory
   fi
-  STARSHIP_CONFIG=/etc/starship.toml
-  export STARSHIP_CONFIG
-  eval "$(starship init bash)"
-
-  # Enable fzf keybindings
-  [ -r /run/host/usr/share/fzf/shell/key-bindings.bash ] && \
-  . /run/host/usr/share/fzf/shell/key-bindings.bash
-
-  # Enable atuin and bash-prexec
-  source /usr/share/bash-prexec
-  eval "$(atuin init bash)"
-
-  # Enable zoxide
-  eval "$(zoxide init bash --cmd cd)"
 fi
 
 # vim:ts=4:sw=4
