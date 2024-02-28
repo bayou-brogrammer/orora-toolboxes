@@ -8,7 +8,7 @@ LABEL com.github.containers.toolbox="true" \
 
 RUN mkdir -p /etc/fish/conf.d
 COPY toolboxes/arch-toolbox/distrobox.fish /etc/fish/conf.d/
-COPY shared \ 
+COPY shared/files \ 
   toolboxes/arch-toolbox/extra-packages /
 
 RUN \
