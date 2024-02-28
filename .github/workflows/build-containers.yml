@@ -44,8 +44,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        toolbox_name:
-          ["arch-toolbox", "orora-cli", "wolfi-toolbox", "wolfi-dx-toolbox"]
+        toolbox_name: ["arch-toolbox", "orora-cli"]
 
     steps:
       - name: Checkout

@@ -8,7 +8,6 @@ LABEL com.github.containers.toolbox="true" \
 
 ARG IMAGE_NAME="${IMAGE_NAME:-wolfi-toolbox}"
 
-COPY shared /
 COPY ./toolboxes/wolfi-toolbox/packages.wolfi \
     ./toolboxes/wolfi-toolbox/packages.wolfi-dx \
     /tmp/
