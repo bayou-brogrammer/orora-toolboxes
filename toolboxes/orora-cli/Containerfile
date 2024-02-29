@@ -15,27 +15,36 @@ LABEL maintainer="lecoqjacob@proton.me" \
 # ================================= #
 
 COPY shared/files /
+COPY toolboxes/orora-cli/extra-packages /
 
 RUN apk update && \
     apk upgrade && \
     grep -v '^#' /extra-packages | xargs apk add && \
-    mv /etc/profile.d/00-bluefin-cli-brew-firstrun.sh /etc/profile.d/00-isengard-cli-brew-firstrun.sh && \
-    sed -i 's/Bluefin/Isengard/g; s/bluefin/isengard/g' /etc/profile.d/00-isengard-cli-brew-firstrun.sh && \
+    mv /etc/profile.d/00-bluefin-cli-brew-firstrun.sh /etc/profile.d/00-orora-cli-brew-firstrun.sh && \
+    sed -i 's/Bluefin/Orora/g; s/bluefin/orora/g' /etc/profile.d/00-orora-cli-brew-firstrun.sh && \
+    # Setup the XDG directories
     mkdir -p /XDG_DIRS && \
+    mkdir -p /XDG_DIRS/cache && \
     mkdir -p /XDG_DIRS/config && \
     mkdir -p /XDG_DIRS/local/share && \
     mkdir -p /XDG_DIRS/local/state && \
-    mkdir -p /XDG_DIRS/cache && \
+    # Rust
+    # Get Rust; NOTE: using sh for better compatibility with other base images
+    curl https://sh.rustup.rs -sSf | sh -s -- -y && \
+    # Tmux
     mv /tmux /XDG_DIRS/config/tmux && \
-    source /etc/profile.d/01-isengard-xdg.sh && \
+    source /etc/profile.d/01-orora-xdg.sh && \
     git clone https://github.com/tmux-plugins/tpm /XDG_DIRS/config/tmux/plugins/tpm && \
     /XDG_DIRS/config/tmux/plugins/tpm/bin/install_plugins && \
-    mv /isengard-nvim /XDG_DIRS/config/nvim && \
-    nvim --headless "+Lazy! sync" +qa && \
+    # mv /isengard-nvim /XDG_DIRS/config/nvim && \
+    # nvim --headless "+Lazy! sync" +qa && \
     chmod -R o+rwx /XDG_DIRS/ && \
     ln -fs /usr/bin/distrobox-host-exec /usr/bin/ujust && \
+    ln -fs /usr/bin/distrobox-host-exec /usr/bin/flatpak && \
     ln -fs /usr/bin/distrobox-host-exec /usr/bin/distrobox && \
-    ln -fs /usr/bin/distrobox-host-exec /usr/local/bin/code && \
-    ln -fs /usr/bin/distrobox-host-exec /usr/local/bin/kde-prompt
+    ln -fs /usr/bin/distrobox-host-exec /usr/local/bin/code
+
+# Add .cargo/bin to PATH
+ENV PATH="/root/.cargo/bin:${PATH}"
 
 RUN rm /extra-packages

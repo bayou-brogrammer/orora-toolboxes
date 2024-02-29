@@ -35,7 +35,7 @@ jobs:
 
       - name: Generate package list
         run: |
-          APK_LIST="distrobox-host-compat.yaml"
+          APK_LIST="apko/distrobox-host-compat.yaml"
           echo "APK_LIST=$APK_LIST" >> $GITHUB_ENV
 
       # Build APKs with melange
