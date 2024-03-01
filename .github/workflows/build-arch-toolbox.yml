@@ -1,24 +1,15 @@
-name: Build and Push Image
+name: Build and Push Arch Toolbox
 
 on:
   schedule:
-    - cron: "0 6 * * *" # at 06:00 UTC (midnight CST)
+    - cron: "0 6,18 * * *" # 6am and 6pm every day
 
   pull_request:
-    branches:
-      - main
-      - testing
-    paths-ignore:
-      - "**.md"
-
+    paths:
+      - "toolboxes/arch-toolbox/**"
   push:
-    branches:
-      - main
-      - testing
-    tags:
-      - "v*.*.*"
-    paths-ignore:
-      - "**.md"
+    paths:
+      - "toolboxes/arch-toolbox/**"
 
   workflow_dispatch:
 
@@ -30,11 +21,12 @@ env:
   DOCKER_BUILDKIT: 1
   BUILDX_EXPERIMENTAL: 1
   FEDORA_MAJOR_VERSION: 39
+  TOOLBOX_NAME: arch-toolbox
+  CONTAINERFILE_PATH: ./toolboxes/arch-toolbox/Containerfile
 
 jobs:
   run-build:
-    name: Build and Push Orora Image
-
+    name: Build and Push Arch Toolbox
     runs-on: ubuntu-22.04
     continue-on-error: false
     permissions:
@@ -44,7 +36,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        toolbox_name: ["arch-toolbox", "orora-cli"]
+        toolbox_name: ["orora-cli"]
 
     steps:
       - name: Checkout
@@ -52,27 +44,14 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Generate Containerfile path
-        shell: bash
-        run: |
-          #!/bin/bash
-
-          if grep -q "wolfi" <<< "${{ matrix.toolbox_name }}"; then
-            TOOLBX="wolfi-toolbox"
-          else
-            TOOLBX="${{ matrix.toolbox_name }}"
-          fi
-
-          echo "CONTAINERFILE_PATH=./toolboxes/${TOOLBX}/Containerfile" >> $GITHUB_ENV
-
       - name: Build and Deploy image
         uses: bayou-brogrammer/deploy-container-action@main
         with:
           support: latest
           push_container: "true"
-          target: ${{ matrix.toolbox_name }}
+          target: ${{ env.TOOLBOX_NAME }}
           file: ${{ env.CONTAINERFILE_PATH }}
-          image_name: ${{ matrix.toolbox_name }}
+          image_name: ${{ env.TOOLBOX_NAME }}
           image_variant: ${{ env.IMAGE_VARIANT }}
           version: ${{ env.FEDORA_MAJOR_VERSION }}
           signing_key: ${{ secrets.SIGNING_SECRET }}

@@ -29,7 +29,7 @@ USER build
 WORKDIR /home/build
 
 # reinstall/upgrade everything with manpages based on the config change we make above
-# also install extra-packages
+# also install packages
 RUN \
   --mount=type=cache,dst=/var/cache/pacman,id=pacman-cache-orora-latest,sharing=locked \
   paru -Syu --noconfirm $(cat /to-reinstall /extra-packages) && \

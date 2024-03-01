@@ -36,7 +36,7 @@ RUN apk update && \
     source /etc/profile.d/01-orora-xdg.sh && \
     git clone https://github.com/tmux-plugins/tpm /XDG_DIRS/config/tmux/plugins/tpm && \
     /XDG_DIRS/config/tmux/plugins/tpm/bin/install_plugins && \
-    # mv /isengard-nvim /XDG_DIRS/config/nvim && \
+    # mv /orora-nvim /XDG_DIRS/config/nvim && \
     # nvim --headless "+Lazy! sync" +qa && \
     chmod -R o+rwx /XDG_DIRS/ && \
     ln -fs /usr/bin/distrobox-host-exec /usr/bin/ujust && \

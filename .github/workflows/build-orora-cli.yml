@@ -1,0 +1,61 @@
+name: Build and Push Orora CLI
+
+on:
+  schedule:
+    - cron: "0 6,18 * * *" # 6am and 6pm every day
+
+  pull_request:
+    paths:
+      - "toolboxes/orora-cli/**"
+  push:
+    paths:
+      - "toolboxes/orora-cli/**"
+
+  workflow_dispatch:
+
+concurrency:
+  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref || github.run_id }}
+
+env:
+  DOCKER_BUILDKIT: 1
+  BUILDX_EXPERIMENTAL: 1
+  FEDORA_MAJOR_VERSION: 39
+  TOOLBOX_NAME: orora-cli
+  CONTAINERFILE_PATH: ./toolboxes/orora-cli/Containerfile
+
+jobs:
+  run-build:
+    name: Build and Push Orora CLI
+    runs-on: ubuntu-22.04
+    continue-on-error: false
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    strategy:
+      fail-fast: false
+      matrix:
+        toolbox_name: ["orora-cli"]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Build and Deploy image
+        uses: bayou-brogrammer/deploy-container-action@main
+        with:
+          support: latest
+          push_container: "true"
+          target: ${{ env.TOOLBOX_NAME }}
+          file: ${{ env.CONTAINERFILE_PATH }}
+          image_name: ${{ env.TOOLBOX_NAME }}
+          image_variant: ${{ env.IMAGE_VARIANT }}
+          version: ${{ env.FEDORA_MAJOR_VERSION }}
+          signing_key: ${{ secrets.SIGNING_SECRET }}
+          container_registry: ghcr.io/${{ github.repository_owner }}
+        env:
+          IMAGE_VARIANT: main
+          CONTAINERFILE_PATH: ${{ env.CONTAINERFILE_PATH }}

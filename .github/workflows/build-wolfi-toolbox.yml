@@ -1,10 +1,16 @@
 name: Build and Push Wolfi Toolbox Image
 on:
+  merge_group:
+  workflow_dispatch:
+
   schedule:
     - cron: "0 6,18 * * *" # 6am and 6pm every day
   pull_request:
-  merge_group:
-  workflow_dispatch:
+    paths:
+      - "toolboxes/wolfi-toolbox/**"
+  push:
+    paths:
+      - "toolboxes/wolfi-toolbox/**"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref || github.run_id }}
@@ -18,7 +24,7 @@ env:
 
 jobs:
   push-ghcr:
-    name: Build and push image
+    name: Build and push Wolfi Toolbox image
     runs-on: ubuntu-22.04
     permissions:
       contents: read
