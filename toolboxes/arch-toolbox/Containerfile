@@ -38,7 +38,7 @@ RUN \
 # reinstall xdg-utils-distrobox to get its manpages
 RUN git clone https://github.com/KyleGospo/xdg-utils-distrobox-arch.git --single-branch && \
   cd xdg-utils-distrobox-arch/trunk && \
-  makepkg -si --noconfirm && \
+  makepkg -si --noconfirm --skipinteg && \
   cd ../.. && \
   rm -drf xdg-utils-distrobox-arch
 

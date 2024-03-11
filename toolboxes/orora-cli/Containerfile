@@ -39,7 +39,4 @@ RUN \
     ln -fs /usr/bin/distrobox-host-exec /usr/local/bin/code && \
     /programs.sh
 
-# Add .cargo/bin to PATH
-ENV PATH="/root/.cargo/bin:${PATH}"
-
 RUN rm /extra-packages /programs.sh
