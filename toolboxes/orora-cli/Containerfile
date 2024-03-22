@@ -33,10 +33,14 @@ RUN \
     # mv /orora-nvim /XDG_DIRS/config/nvim && \
     # nvim --headless "+Lazy! sync" +qa && \
     # chmod -R o+rwx /XDG_DIRS/ && \
+    # LINK LOCAL
+    ln -fs /usr/bin/distrobox-host-exec /usr/local/bin/code && \
+    # LINK BIN
     ln -fs /usr/bin/distrobox-host-exec /usr/bin/ujust && \
     ln -fs /usr/bin/distrobox-host-exec /usr/bin/flatpak && \
     ln -fs /usr/bin/distrobox-host-exec /usr/bin/distrobox && \
-    ln -fs /usr/bin/distrobox-host-exec /usr/local/bin/code && \
+    ln -fs /usr/bin/distrobox-host-exec /usr/bin/gpg-agent && \
+    ln -fs /usr/bin/distrobox-host-exec /usr/bin/pinentry-gnome3 && \
     /programs.sh
 
 RUN rm /extra-packages /programs.sh
