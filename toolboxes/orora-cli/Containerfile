@@ -22,17 +22,8 @@ RUN apk update && \
     grep -v '^#' /extra-packages | xargs apk add && \
     mv /etc/profile.d/00-bluefin-cli-brew-firstrun.sh /etc/profile.d/00-orora-cli-brew-firstrun.sh && \
     sed -i 's/Bluefin/Orora/g; s/bluefin/orora/g' /etc/profile.d/00-orora-cli-brew-firstrun.sh
-    # Setup the XDG directories
-    # mkdir -p /XDG_DIRS && \
-    # mkdir -p /XDG_DIRS/cache && \
-    # mkdir -p /XDG_DIRS/config && \
-    # mkdir -p /XDG_DIRS/local/share && \
-    # mkdir -p /XDG_DIRS/local/state
 
 RUN \
-    # mv /orora-nvim /XDG_DIRS/config/nvim && \
-    # nvim --headless "+Lazy! sync" +qa && \
-    # chmod -R o+rwx /XDG_DIRS/ && \
     # LINK LOCAL
     ln -fs /usr/bin/distrobox-host-exec /usr/local/bin/code && \
     # LINK BIN
